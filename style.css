@@ -979,21 +979,67 @@ li span {
   0% {
     transform: translateX(0) translateY(0) scale(1) rotate(0deg);
     opacity: 1;
+    z-index: 1000;
+  }
+  25% {
+    transform: translateX(-20vw) translateY(-30px) scale(0.9) rotate(-5deg);
+    opacity: 0.9;
   }
   50% {
-    transform: translateX(-50vw) translateY(-20px) scale(0.8) rotate(-10deg);
-    opacity: 0.7;
+    transform: translateX(-40vw) translateY(-60px) scale(0.7) rotate(-15deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateX(-60vw) translateY(-80px) scale(0.5) rotate(-25deg);
+    opacity: 0.6;
   }
   100% {
-    transform: translateX(-100vw) translateY(-50px) scale(0.3) rotate(-20deg);
+    transform: translateX(-80vw) translateY(-100px) scale(0.2) rotate(-35deg);
     opacity: 0;
   }
 }
 
-.li-flying-completed {
+/* Animacija za letenje u trash bin */
+@keyframes flyToTrash {
+  0% {
+    transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 1000;
+  }
+  25% {
+    transform: translateX(20vw) translateY(-30px) scale(0.9) rotate(5deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(40vw) translateY(-60px) scale(0.7) rotate(15deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateX(60vw) translateY(-80px) scale(0.5) rotate(25deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(80vw) translateY(-100px) scale(0.2) rotate(35deg);
+    opacity: 0;
+  }
+}
+
+.flying-to-completed {
   animation: flyToCompleted 2.5s ease-in-out forwards;
-  z-index: 1001;
   position: relative;
+  z-index: 1001;
+}
+
+.flying-to-trash {
+  animation: flyToTrash 2.5s ease-in-out forwards;
+  position: relative;
+  z-index: 1001;
+}
+
+.flying-to-completed .todo-text,
+.flying-to-trash .todo-text {
+  text-decoration: line-through;
+  opacity: 0.7;
 }
 
 .completed-item {
@@ -1432,5 +1478,54 @@ li span {
   .remove-completed-btn {
     width: 100% !important;
     margin: 2px 0 !important;
+  }
+
+  /* Adjust animations for mobile */
+  @keyframes flyToCompleted {
+    0% {
+      transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+      opacity: 1;
+      z-index: 1000;
+    }
+    25% {
+      transform: translateX(-15vw) translateY(-20px) scale(0.9) rotate(-3deg);
+      opacity: 0.9;
+    }
+    50% {
+      transform: translateX(-30vw) translateY(-40px) scale(0.7) rotate(-8deg);
+      opacity: 0.8;
+    }
+    75% {
+      transform: translateX(-45vw) translateY(-60px) scale(0.5) rotate(-15deg);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(-60vw) translateY(-80px) scale(0.2) rotate(-20deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes flyToTrash {
+    0% {
+      transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+      opacity: 1;
+      z-index: 1000;
+    }
+    25% {
+      transform: translateX(15vw) translateY(-20px) scale(0.9) rotate(3deg);
+      opacity: 0.9;
+    }
+    50% {
+      transform: translateX(30vw) translateY(-40px) scale(0.7) rotate(8deg);
+      opacity: 0.8;
+    }
+    75% {
+      transform: translateX(45vw) translateY(-60px) scale(0.5) rotate(15deg);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateX(60vw) translateY(-80px) scale(0.2) rotate(20deg);
+      opacity: 0;
+    }
   }
 }

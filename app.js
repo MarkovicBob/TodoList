@@ -156,7 +156,45 @@ function moveToCompleted(todoElement) {
   setTimeout(() => {
     todoElement.remove();
     updateCompletedBin();
-  }, 3000); // 3 seconds for the animation
+  }, 2500); // 2.5 seconds for the animation
+}
+
+// Function to move todo to trash with animation
+function moveToTrash(todoElement) {
+  const todoText = todoElement.querySelector(".todo-text").innerText;
+  const originalIndex = Array.from(todoList.children).indexOf(todoElement);
+
+  // Add to trash
+  deletedTodos.push({
+    text: todoText,
+    originalIndex: originalIndex,
+    deleteTime: Date.now(),
+  });
+
+  // Add flying animation class
+  todoElement.classList.add("flying-to-trash");
+
+  // Remove from DOM after animation
+  setTimeout(() => {
+    todoElement.remove();
+    updateTrashBin();
+  }, 2500); // 2.5 seconds for the animation
+
+  // Auto-delete after timeout
+  setTimeout(() => {
+    const itemIndex = deletedTodos.findIndex(
+      (item) =>
+        item.text === todoText &&
+        Math.abs(item.deleteTime - Date.now() + TRASH_TIMEOUT) < 1000
+    );
+    if (itemIndex !== -1) {
+      deletedTodos.splice(itemIndex, 1);
+      updateTrashBin();
+      if (trashPanel.style.display === "block") {
+        updateTrashPanel();
+      }
+    }
+  }, TRASH_TIMEOUT);
 }
 
 // Function to update completed panel
@@ -321,37 +359,7 @@ todoForm.addEventListener("submit", function (event) {
 todoList.addEventListener("click", function (event) {
   if (event.target.className === "delete") {
     const li = event.target.parentElement;
-    const todoText = li.querySelector(".todo-text").innerText;
-    const originalIndex = Array.from(todoList.children).indexOf(li);
-
-    // Add to trash
-    deletedTodos.push({
-      text: todoText,
-      originalIndex: originalIndex,
-      deleteTime: Date.now(),
-    });
-
-    // Remove from DOM
-    li.remove();
-
-    // Update trash bin
-    updateTrashBin();
-
-    // Auto-delete after timeout
-    setTimeout(() => {
-      const itemIndex = deletedTodos.findIndex(
-        (item) =>
-          item.text === todoText &&
-          item.deleteTime === deletedTodos[deletedTodos.length - 1].deleteTime
-      );
-      if (itemIndex !== -1) {
-        deletedTodos.splice(itemIndex, 1);
-        updateTrashBin();
-        if (trashPanel.style.display === "block") {
-          updateTrashPanel();
-        }
-      }
-    }, TRASH_TIMEOUT);
+    moveToTrash(li);
   }
 
   if (event.target.className === "edit") {

@@ -5,9 +5,14 @@ const trashBin = document.getElementById("trash-bin");
 const trashPanel = document.getElementById("trash-panel");
 const trashItems = document.getElementById("trash-items");
 const trashCount = document.getElementById("trash-count");
+const completedBin = document.getElementById("completed-bin");
+const completedPanel = document.getElementById("completed-panel");
+const completedItems = document.getElementById("completed-items");
+const completedCount = document.getElementById("completed-count");
 
 // Trash bin functionality
 let deletedTodos = [];
+let completedTodos = [];
 const TRASH_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Function to update trash bin visibility and count
@@ -18,6 +23,17 @@ function updateTrashBin() {
   } else {
     trashCount.style.display = "none";
     trashPanel.style.display = "none";
+  }
+}
+
+// Function to update completed bin visibility and count
+function updateCompletedBin() {
+  if (completedTodos.length > 0) {
+    completedCount.style.display = "flex";
+    completedCount.textContent = completedTodos.length;
+  } else {
+    completedCount.style.display = "none";
+    completedPanel.style.display = "none";
   }
 }
 
@@ -76,6 +92,17 @@ function restoreItem(index) {
 
   // Recreate the todo item
   const li = document.createElement("li");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "todo-checkbox";
+  checkbox.addEventListener("change", function () {
+    if (this.checked) {
+      moveToCompleted(li);
+    }
+  });
+  li.appendChild(checkbox);
+
   const textSpan = document.createElement("span");
   textSpan.innerText = item.text;
   textSpan.className = "todo-text";
@@ -112,9 +139,111 @@ function permanentDelete(index) {
   updateTrashBin();
 }
 
+// Function to move todo to completed
+function moveToCompleted(todoElement) {
+  const todoText = todoElement.querySelector(".todo-text").innerText;
+
+  // Add to completed todos
+  completedTodos.push({
+    text: todoText,
+    completedTime: Date.now(),
+  });
+
+  // Add flying animation class
+  todoElement.classList.add("flying-to-completed");
+
+  // Remove from DOM after animation
+  setTimeout(() => {
+    todoElement.remove();
+    updateCompletedBin();
+  }, 3000); // 3 seconds for the animation
+}
+
+// Function to update completed panel
+function updateCompletedPanel() {
+  completedItems.innerHTML = "";
+
+  completedTodos.forEach((item, index) => {
+    const completedItem = document.createElement("div");
+    completedItem.className = "completed-item";
+    completedItem.innerHTML = `
+      <span class="completed-text">${item.text}</span>
+      <div class="completed-item-actions">
+        <button class="uncomplete-btn" onclick="uncompleteItem(${index})">Restore to Todo</button>
+        <button class="remove-completed-btn" onclick="removeCompleted(${index})">Remove</button>
+      </div>
+    `;
+    completedItems.appendChild(completedItem);
+  });
+}
+
+// Function to remove completed item
+function removeCompleted(index) {
+  completedTodos.splice(index, 1);
+  updateCompletedPanel();
+  updateCompletedBin();
+}
+
+// Function to uncomplete item (restore to todo list)
+function uncompleteItem(index) {
+  const item = completedTodos[index];
+
+  // Create new todo item
+  const li = document.createElement("li");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "todo-checkbox";
+  checkbox.addEventListener("change", function () {
+    if (this.checked) {
+      moveToCompleted(li);
+    }
+  });
+  li.appendChild(checkbox);
+
+  const textSpan = document.createElement("span");
+  textSpan.innerText = item.text;
+  textSpan.className = "todo-text";
+  li.appendChild(textSpan);
+
+  const editSpan = document.createElement("span");
+  editSpan.innerText = "Edit";
+  editSpan.className = "edit";
+  li.appendChild(editSpan);
+
+  const deleteSpan = document.createElement("span");
+  deleteSpan.innerText = "Delete";
+  deleteSpan.className = "delete";
+  li.appendChild(deleteSpan);
+
+  // Add to todo list
+  todoList.appendChild(li);
+
+  // Remove from completed todos
+  completedTodos.splice(index, 1);
+  updateCompletedPanel();
+  updateCompletedBin();
+}
+
 // Make functions globally accessible
-window.restoreItem = restoreItem;
-window.permanentDelete = permanentDelete;
+window.removeCompleted = removeCompleted;
+window.uncompleteItem = uncompleteItem;
+
+// Completed bin click handler
+completedBin.addEventListener("click", function (e) {
+  e.stopPropagation(); // Prevent event bubbling
+  if (completedPanel.style.display === "block") {
+    completedPanel.style.display = "none";
+  } else {
+    completedPanel.style.display = "block";
+    updateCompletedPanel();
+  }
+});
+
+// Prevent completed panel from closing when clicking inside it
+completedPanel.addEventListener("click", function (e) {
+  e.stopPropagation();
+});
 
 // Trash bin click handler
 trashBin.addEventListener("click", function (e) {
@@ -137,6 +266,9 @@ document.addEventListener("click", function (e) {
   if (trashPanel.style.display === "block") {
     trashPanel.style.display = "none";
   }
+  if (completedPanel.style.display === "block") {
+    completedPanel.style.display = "none";
+  }
 });
 
 // Update trash panel every second
@@ -146,14 +278,25 @@ setInterval(() => {
   }
 }, 1000);
 
-// Initialize trash bin
+// Initialize trash bin and completed bin
 updateTrashBin();
+updateCompletedBin();
 
 todoForm.addEventListener("submit", function (event) {
   event.preventDefault();
   const todoText = todoInput.value;
   if (todoText !== "") {
     const li = document.createElement("li");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "todo-checkbox";
+    checkbox.addEventListener("change", function () {
+      if (this.checked) {
+        moveToCompleted(li);
+      }
+    });
+    li.appendChild(checkbox);
 
     const textSpan = document.createElement("span");
     textSpan.innerText = todoText;
@@ -246,6 +389,16 @@ todoList.addEventListener("click", function (event) {
       if (newText !== "") {
         li.innerHTML = "";
 
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "todo-checkbox";
+        checkbox.addEventListener("change", function () {
+          if (this.checked) {
+            moveToCompleted(li);
+          }
+        });
+        li.appendChild(checkbox);
+
         const newTextSpan = document.createElement("span");
         newTextSpan.innerText = newText;
         newTextSpan.className = "todo-text";
@@ -266,6 +419,16 @@ todoList.addEventListener("click", function (event) {
     // Cancel functionality
     const cancelEdit = function () {
       li.innerHTML = "";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "todo-checkbox";
+      checkbox.addEventListener("change", function () {
+        if (this.checked) {
+          moveToCompleted(li);
+        }
+      });
+      li.appendChild(checkbox);
 
       const originalTextSpan = document.createElement("span");
       originalTextSpan.innerText = currentText;

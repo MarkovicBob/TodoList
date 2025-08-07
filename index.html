@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Todo List</h1>
+    <form id="todo-form">
+      <input id="todo-input" type="text" placeholder="Add new task" />
+      <button type="submit">Add</button>
+    </form>
+    <ul id="todo-list"></ul>
+
+    <!-- Trash Bin -->
+    <div id="trash-bin" class="trash-bin">
+      <div class="trash-bin-icon">🗑️</div>
+      <div id="trash-count" class="trash-count" style="display: none">0</div>
+    </div>
+
+    <!-- Trash Panel -->
+    <div id="trash-panel" class="trash-panel">
+      <h3>Deleted Items</h3>
+      <div id="trash-items"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

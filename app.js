@@ -45,14 +45,16 @@ function updateTrashPanel() {
 
     const trashItem = document.createElement("div");
     trashItem.className = "trash-item";
-    
+
     // Dodaj klase za različite nivoe urgentnosti
-    if (timeRemaining <= 2000) { // Poslednje 2 sekunde - vrlo urgentno
+    if (timeRemaining <= 2000) {
+      // Poslednje 2 sekunde - vrlo urgentno
       trashItem.classList.add("expiring-urgent");
-    } else if (timeRemaining <= 5000) { // Poslednje 5 sekundi - umereno urgentno
+    } else if (timeRemaining <= 5000) {
+      // Poslednje 5 sekundi - umereno urgentno
       trashItem.classList.add("expiring-soon");
     }
-    
+
     trashItem.innerHTML = `
       <div class="trash-item-text">${item.text}</div>
       <div class="trash-item-timer">Time remaining: ${formatTimeRemaining(
